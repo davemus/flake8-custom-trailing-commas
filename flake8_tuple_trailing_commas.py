@@ -32,7 +32,8 @@ class Plugin:
             return True
         token_idx -= 1
         token = self._file_tokens[token_idx]
-        if token.type == 4:
+        newline_tokens = [4, 61]
+        if token.type in newline_tokens:
             return self.validate_previous_tokens(token_idx)
         return token.type == 54 and token.string == ','
 
