@@ -35,7 +35,7 @@ class TestPlugin(unittest.TestCase):
 
     def test_without_comma_tuple(self):
         self.assertSetEqual(
-            set(('1,9: FNA100 trailing comma in tuple is missing',)),
+            set(('1,9: CMA100 trailing comma in tuple is missing',)),
             _results('(1, 2, 3)')
         )
 
@@ -43,7 +43,7 @@ class TestPlugin(unittest.TestCase):
         self.assertSetEqual(_results(valid_multiline), set())
 
     def test_multiline_invalid(self):
-        msg = '4,1: FNA100 trailing comma in tuple is missing'
+        msg = '4,1: CMA100 trailing comma in tuple is missing'
         self.assertSetEqual(_results(invalid_multiline), set((msg,)))
 
 

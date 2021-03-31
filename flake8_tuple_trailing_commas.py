@@ -16,7 +16,7 @@ class Visitor(ast.NodeVisitor):
         self.generic_visit(node)
 
 
-_MSG_MISSING_COMMA_TUPLE = 'FNA100 trailing comma in tuple is missing'
+_MSG_MISSING_COMMA_TUPLE = 'CMA100 trailing comma in tuple is missing'
 
 
 class Plugin:
