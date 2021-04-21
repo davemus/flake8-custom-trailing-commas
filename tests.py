@@ -10,7 +10,7 @@ def _results(code):
     ast_tree = ast.parse(code)
     tokens = list(tokenize.tokenize(BytesIO(bytes(code, encoding='utf-8')).readline))
     plugin = Plugin(ast_tree, tokens)
-    return {f'{line},{offset}: {msg}' for line, offset, msg, _ in plugin.run()}
+    return set({f'{line},{offset}: {msg}' for line, offset, msg, _ in plugin.run()})
 
 
 valid_multiline = """
@@ -74,6 +74,33 @@ class TestDotInEndOfErrors(unittest.TestCase):
             {'1,67: CMA200 message of ValidationError should end with dot'},
             _results('raise rest_framework.exceptions.ValidationError("Error without dot")')
         )
-    
+
+    def test_with_dot_inside_dict(self):
+        self.assertSetEqual(
+            set(),
+            _results('raise ValidationError({"spam": "With dot."})')
+        )
+
+    def test_without_dot_inside_dict(self):
+        self.assertSetEqual(
+            {'1,44: CMA200 message of ValidationError should end with dot'},
+            _results('raise ValidationError({"spam": "Without dot"})')
+        )
+
+    def test_with_dot_inside_dict(self):
+        self.assertSetEqual(
+            set(),
+            _results('raise ValidationError(["With dot."])')
+        )
+
+    def test_without_dot_inside_dict(self):
+        self.assertSetEqual(
+            {'1,36: CMA200 message of ValidationError should end with dot'},
+            _results('raise ValidationError(["Without dot"])')
+        )
+
+
+
+
 if __name__ == '__main__':
     unittest.main()

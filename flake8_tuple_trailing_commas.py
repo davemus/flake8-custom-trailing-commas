@@ -17,6 +17,16 @@ class Visitor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def _validate_payload(self, payload):
+        if isinstance(payload, ast.Dict):
+            for value in payload.values:
+                self._validate_payload(value)
+            return
+
+        if isinstance(payload, ast.List):
+            for elt in payload.elts:
+                self._validate_payload(elt)
+            return
+        
         msg = payload.value
         if msg and not msg.endswith('.'):
             self.exceptions_without_dots.append(
