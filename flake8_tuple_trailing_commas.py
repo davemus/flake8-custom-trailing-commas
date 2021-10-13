@@ -10,8 +10,28 @@ else:
 class Visitor(ast.NodeVisitor):
     def __init__(self):
         self.tuple_closing_bracket_positions = []
+        self.tuple_closing_bracket_positions_not_checked = set()
         self.exceptions_without_dots = []
         self.exceptions_not_wrapped = []
+
+    def _dont_check_trailing_commas(self, node):
+        if isinstance(node, ast.Tuple):
+            self.tuple_closing_bracket_positions_not_checked.add(
+                (node.end_lineno, node.end_col_offset,)
+            )
+
+    def visit_With(self, node):
+        for item in node.items:
+            self._dont_check_trailing_commas(item.context_expr)
+        self.generic_visit(node)
+
+    def visit_Return(self, node):
+        self._dont_check_trailing_commas(node.value)
+        self.generic_visit(node)
+
+    def visit_Yield(self, node):
+        self._dont_check_trailing_commas(node.value)
+        self.generic_visit(node)
 
     def visit_Tuple(self, node):
         empty_tuple = not bool(node.elts)
@@ -91,6 +111,7 @@ class Plugin:
         if token.type in newline_tokens:
             return self.tuple_validate_comma(token_idx)
         return token.type == 54 and token.string == ','
+
     def run(self):
         visitor = Visitor()
         visitor.visit(self._ast)
@@ -105,6 +126,8 @@ class Plugin:
 
         # process_tuple_trailing_commas
         for position in visitor.tuple_closing_bracket_positions:
+            if position in visitor.tuple_closing_bracket_positions_not_checked:
+                continue
             idx = self._file_tokens.index(next(x for x in self._file_tokens if x.end == position))
             if not self.tuple_validate_comma(idx):
                 yield (position[0], position[1], _MSG_MISSING_COMMA_TUPLE, type(self),)

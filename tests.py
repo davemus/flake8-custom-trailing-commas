@@ -25,6 +25,26 @@ fields = (
 )
 """
 
+return_no_comma = """
+def fun():
+    return (42, 42)
+"""
+
+return_no_comma2 = """
+def fun():
+    return 42, 42
+"""
+
+with_no_comma = """
+with (context1, context2):
+    do_stuff()
+"""
+
+with_no_comma2 = """
+with context1, context2:
+    do_stuff()
+"""
+
 
 class TestTrailingCommas(unittest.TestCase):
     def test_trivial_case(self):
@@ -48,6 +68,24 @@ class TestTrailingCommas(unittest.TestCase):
 
     def test_unpacking(self):
         self.assertSetEqual(_results("a, *b = c"), set())
+
+    def test_yield_no_comma_is_valid(self):
+        self.assertSetEqual(_results("yield (a, b)"), set())
+
+    def test_yield_no_comma_is_valid(self):
+        self.assertSetEqual(_results("yield a, b"), set())
+
+    def test_return_no_comma_is_valid(self):
+        self.assertSetEqual(_results(return_no_comma), set())
+
+    def test_return_no_comma_is_valid2(self):
+        self.assertSetEqual(_results(return_no_comma2), set())
+
+    def test_with_no_comma_is_valid(self):
+        self.assertSetEqual(_results(with_no_comma), set())
+
+    def test_with_no_comma_is_valid2(self):
+        self.assertSetEqual(_results(with_no_comma2), set())
 
 
 not_wrapped_variable = """
