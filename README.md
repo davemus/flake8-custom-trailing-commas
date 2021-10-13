@@ -55,6 +55,5 @@ raise ValidationError(_('Internationalized'))
 
 ## Known bugs
 
-* CMA100 incorrectly handles return/yield with multiple parameters
 * CMA201 can't handle case of error message, defined outside ValidationError yet
 
