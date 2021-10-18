@@ -57,3 +57,5 @@ raise ValidationError(_('Internationalized'))
 
 * CMA201 can't handle case of error message, defined outside ValidationError yet
 
+* CMA201 false positive if wrapping into mark_safe
+
